@@ -17,13 +17,23 @@
 {% for char in chars %}
   {% assign i = forloop.index0 | times: 8 %}
   {% assign j = i | divided_by: 32 | floor %}
+  {% assign k = i | modulo: 32 %}
   {% assign new_words = '' | split: '' %}
 
   # Cannot assign to an array item, so need to create a new array
   # writing the value we want in the right place
   {% for word in words %}
     {% if forloop.index0 == j %}
-      {% assign new_word = 'xxx' %} # Need a charCodeAt here
+      {%- for char_check in site.data.char_codes %}
+        {%- if char_check == char %}
+          {% assign char_code = forloop.index0 %}
+        {%- endif %}
+      {%- endfor %}
+
+      {% for pow in (1..k) %}
+        {% assign char_code = char_code | times: 2 %}
+      {% endfor %}
+      {% assign new_word = word | plus: char_code %} # need a bitwise OR here?
     {% else %}
       {% assign new_word = word %}
     {% endif %}
