@@ -1,2 +1,37 @@
+# https://github.com/blueimp/JavaScript-MD5/blob/e1346d5944bf0c06677ab992c1587c4be702ac80/js/md5.js
+
+{% assign length = include.string.size %}
+{% assign length8 = include.string.size | times: 8 %}
+{% assign chars = include.string | split: "" %}
+{% assign words = '' | split: '' %}
+
+# rstr2binl - Convert a raw string to an array of little-endian words
+# Characters >255 have their high-byte silently ignored
+
+# initialise words as array of zeroes
+{% for char in chars %}
+  {% assign words = words | push: 0 %}
+{% endfor %}
+
+# For every char, bitwise or the charcode value
+{% for char in chars %}
+  {% assign i = forloop.index0 | times: 8 %}
+  {% assign j = i | divided_by: 32 | floor %}
+  {% assign new_words = '' | split: '' %}
+
+  # Cannot assign to an array item, so need to create a new array
+  # writing the value we want in the right place
+  {% for word in words %}
+    {% if forloop.index0 == j %}
+      {% assign new_word = 'xxx' %} # Need a charCodeAt here
+    {% else %}
+      {% assign new_word = word %}
+    {% endif %}
+    {% assign new_words = new_words | push: new_word %}
+  {% endfor %}
+  {% assign words = new_words %}
+{% endfor %}
+
+{{ words | jsonify }}
 {{ include.string }}
 {%- comment %}no trailing whitespace{% endcomment -%}
