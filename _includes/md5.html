@@ -1,47 +1,61 @@
-# https://github.com/blueimp/JavaScript-MD5/blob/e1346d5944bf0c06677ab992c1587c4be702ac80/js/md5.js
+{%- comment %}
+https://github.com/blueimp/JavaScript-MD5/blob/e1346d5944bf0c06677ab992c1587c4be702ac80/js/md5.js
+{%- endcomment %}
 
-{% assign length = include.string.size %}
-{% assign length8 = include.string.size | times: 8 %}
-{% assign chars = include.string | split: "" %}
-{% assign words = '' | split: '' %}
+{%- assign chars = include.string | split: "" %}
 
-# rstr2binl - Convert a raw string to an array of little-endian words
-# Characters >255 have their high-byte silently ignored
+{%- comment %}
+rstr2binl - Convert a raw string to an array of little-endian words
+Characters over 255 have their high-byte silently ignored
+{%- endcomment %}
 
-# initialise words as array of zeroes
-{% for char in chars %}
-  {% assign words = words | push: 0 %}
-{% endfor %}
+{%- comment %} initialise words as array of zeroes: {%- endcomment %}
+{%- assign word_length = include.string.size | divided_by: 4 | floor %}
+{%- assign words = '' | split: '' %}
 
-# For every char, bitwise or the charcode value
-{% for char in chars %}
-  {% assign i = forloop.index0 | times: 8 %}
-  {% assign j = i | divided_by: 32 | floor %}
-  {% assign k = i | modulo: 32 %}
-  {% assign new_words = '' | split: '' %}
+{%- for char in (0..word_length) %}
+  {%- assign words = words | push: 0 %}
+{%- endfor %}
 
-  # Cannot assign to an array item, so need to create a new array
-  # writing the value we want in the right place
-  {% for word in words %}
-    {% if forloop.index0 == j %}
+{%- comment %} For every char, bitwise or the charcode value {%- endcomment %}
+{%- for char in chars %}
+  {%- assign i = forloop.index0 | times: 8 %}
+  {%- assign j = i | divided_by: 32 | floor %}
+  {%- assign k = i | modulo: 32 %}
+  {%- assign new_words = '' | split: '' %}
+
+  {%- comment %}
+  Cannot assign to an array item, so need to create a new array
+  writing the value we want in the right place
+  {%- endcomment %}
+  {%- for word in words %}
+    {%- if forloop.index0 == j %}
       {%- for char_check in site.data.char_codes %}
         {%- if char_check == char %}
-          {% assign char_code = forloop.index0 %}
+          {%- assign char_code = forloop.index0 %}
         {%- endif %}
       {%- endfor %}
 
-      {% for pow in (1..k) %}
-        {% assign char_code = char_code | times: 2 %}
-      {% endfor %}
-      {% assign new_word = word | plus: char_code %} # need a bitwise OR here?
-    {% else %}
-      {% assign new_word = word %}
-    {% endif %}
-    {% assign new_words = new_words | push: new_word %}
-  {% endfor %}
-  {% assign words = new_words %}
-{% endfor %}
+      {%- for pow in (1..k) %}
+        {%- assign char_code = char_code | times: 2 %}
+      {%- endfor %}
+      {%- comment %} need a bitwise OR here? {% endcomment %}
+      {%- assign new_word = word | plus: char_code %}
+    {%- else %}
+      {%- assign new_word = word %}
+    {%- endif %}
+    {%- assign new_words = new_words | push: new_word %}
+  {%- endfor %}
+  {%- assign words = new_words %}
+{%- endfor %}
 
 {{ words | jsonify }}
+
+{%- comment %}
+binlmd5 - Calculate the MD5 of an array of little-endian words, and a bit length
+{%- endcomment %}
+
+
+
 {{ include.string }}
 {%- comment %}no trailing whitespace{% endcomment -%}
