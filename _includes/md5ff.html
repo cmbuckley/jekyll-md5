@@ -1,0 +1,7 @@
+{%- capture o %}{% include bitwise_and.html a=include.b b=include.d %}{% endcapture %}
+{%- capture p %}
+  {%- assign not_d = include.d | plus: 1 | times: -1 %}
+  {%- include bitwise_and.html a=include.b b=not_d %}
+{%- endcapture %}
+{%- capture q %}{% include bitwise_or.html a=o b=p %}{% endcapture %}
+{%- include md5cmn.html q=q a=include.a b=include.b w=include.w x=include.x s=include.s t=include.t %}

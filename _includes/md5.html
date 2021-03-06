@@ -54,8 +54,43 @@ Characters over 255 have their high-byte silently ignored
 {%- comment %}
 binlmd5 - Calculate the MD5 of an array of little-endian words, and a bit length
 {%- endcomment %}
+{%- assign len8 = include.string.size | times: 8 %}
+
+{%- comment %} append padding {% endcomment %}
+{%- assign x = len8 | modulo: 32 %}
+{%- assign y = 128 %}
+{%- for pow in (1..x) %}
+  {%- assign y = y | times: 2 %}
+{%- endfor %}
+
+{%- assign new_words = '' | split: '' %}
+{%- for word in words %}
+  {%- if forloop.last %}
+    {%- comment %} need a bitwise OR here? {% endcomment %}
+    {%- assign new_word = word | plus: y %}
+  {%- else %}
+    {%- assign new_word = word %}
+  {%- endif %}
+  {%- assign new_words = new_words | push: new_word %}
+{%- endfor %}
+{%- assign words = new_words %}
+
+{%- assign newlen = len8 | plus: 64 | divided_by: 512 | floor | times: 16 | plus: 14 %}
+{%- assign a = 1732584193 %}
+{%- assign b = -271733879 %}
+{%- assign c = -1732584194 %}
+{%- assign d = 271733878 %}
+{%- for i in (0..newlen) -%}
+  {%- assign olda = a %}
+  {%- assign oldb = b %}
+  {%- assign oldc = c %}
+  {%- assign oldd = d %}
+
+  {%- capture a %}{% include md5ff.html a=a b=b c=c d=d w=words x=i s=7 t='-680876936' %}{% endcapture %}
+{%- endfor %}
 
 
+{{ words|jsonify}}
 
 {{ include.string }}
 {%- comment %}no trailing whitespace{% endcomment -%}
