@@ -1,0 +1,11 @@
+{% assign out = 0 %}
+{% assign mul = 1 %}
+{%- for bit in include.bin %}
+  {%- assign cur = bit | times: mul %}
+  {%- assign out = out | plus: cur %}
+  {%- assign mul = mul | times: 2 %}
+{%- endfor -%}
+
+{{ out }}
+
+{%- comment %}Avoid trailing whitespace{% endcomment -%}

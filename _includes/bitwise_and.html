@@ -1,0 +1,18 @@
+{%- capture abinr %}{% include dec2binr.html dec=include.a %}{% endcapture %}
+{%- capture bbinr %}{% include dec2binr.html dec=include.b %}{% endcapture %}
+{%- assign out = '' | split: '' %}
+{%- assign a_bits = abinr | split: '' %}
+{%- assign b_bits = bbinr | split: '' %}
+{%- if include.a > include.b %}
+  {%- assign size = a_bits.size | minus: 1 %}
+{%- else %}
+  {%- assign size = b_bits.size | minus: 1 %}
+{%- endif %}
+{%- for i in (0..size) %}
+  {%- if a_bits[i] == '1' and b_bits[i] == '1' %}
+    {% assign out = out | push: 1 %}
+  {%- else %}
+    {% assign out = out | push: 0 %}
+  {%- endif %}
+{%- endfor %}
+{%- include binr2dec.html bin=out -%}
